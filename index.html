@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>SACHCHI BUNIYAT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ================= GLOBAL ================= */
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+padding: 0;
+text-align: center;
+color: white;
+background: #000;
+overflow-x: hidden;
+}
+
+/* BLUR LOGO BACKGROUND */
+body::before {
+content: "";
+position: fixed;
+inset: 0;
+background: url("logo.png") center no-repeat;
+background-size: 300px;
+filter: blur(10px);
+opacity: 0.12;
+z-index: -2;
+}
+
+/* DARK OVERLAY */
+body::after {
+content: "";
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.88);
+z-index: -1;
+}
+
+/* ================= HEADER ================= */
+header {
+background: black;
+padding: 15px;
+}
+header img {
+height: 70px;
+}
+
+/* ================= SCREENS ================= */
+.screen {
+display: none;
+padding: 25px;
+min-height: calc(100vh - 100px);
+}
+.active {
+display: block;
+}
+
+h2 {
+color: gold;
+}
+
+/* ================= FORM ================= */
+input, select, button {
+width: 90%;
+max-width: 380px;
+padding: 12px;
+margin: 8px 0;
+font-size: 16px;
+border-radius: 6px;
+border: none;
+}
+
+button {
+background: gold;
+color: black;
+font-weight: bold;
+cursor: pointer;
+}
+button:hover {
+opacity: 0.9;
+}
+
+.link {
+color: #00bfff;
+cursor: pointer;
+font-size: 14px;
+}
+
+.note {
+font-size: 13px;
+opacity: 0.8;
+}
+
+/* ================= VOTE BUTTONS ================= */
+.option-btn {
+background: #27ae60;
+margin: 10px auto;
+}
+.option-btn.no {
+background: #c0392b;
+}
+
+/* ================= RESULT ================= */
+.result-box {
+background: rgba(255,255,255,0.08);
+padding: 15px;
+border-radius: 10px;
+margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="logo.png" alt="SACHCHI BUNIYAT">
+</header>
+
+<!-- LANGUAGE -->
+<div id="langScreen" class="screen active">
+<h2>Choose Language</h2>
+<select id="language">
+<option>Hindi</option>
+<option>English</option>
+<option>Hinglish</option>
+</select>
+<br>
+<button onclick="saveLanguage()">Continue</button>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="screen">
+<img src="logo.png" style="height:90px;">
+<h2>Login / Create Profile</h2>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<button onclick="signup()">Create Profile</button>
+<p class="link" onclick="forgotPassword()">Forgot Password?</p>
+</div>
+
+<!-- ADS -->
+<div id="adsScreen" class="screen">
+<h2>Sponsored Message</h2>
+<p>Sach aur public awareness samajhna zaroori hai.</p>
+<button onclick="showScreen('voteScreen')">Continue</button>
+</div>
+
+<!-- VOTE -->
+<div id="voteScreen" class="screen">
+<h2>Public Opinion</h2>
+<p>Sarkari kaam se judi ghatna par aapki rai?</p>
+
+<button class="option-btn" onclick="vote('yes')">Haan</button>
+<button class="option-btn no" onclick="vote('no')">Nahi</button>
+<button class="option-btn" onclick="vote('investigation')">Jaanch Chahiye</button>
+
+<p class="note">Ek user sirf ek baar vote kar sakta hai</p>
+</div>
+
+<!-- RESULT -->
+<div id="resultScreen" class="screen">
+<h2>Voting Result</h2>
+
+<div class="result-box">
+<p id="rYes"></p>
+<p id="rNo"></p>
+<p id="rInv"></p>
+</div>
+
+<p class="note">Anonymous public voting data</p>
+</div>
+
+<script>
+function showScreen(id) {
+document.querySelectorAll(".screen")
+.forEach(s => s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+
+function saveLanguage() {
+localStorage.setItem("language",
+document.getElementById("language").value);
+showScreen("loginScreen");
+}
+
+function signup() {
+if (!email.value || !password.value) {
+alert("Email & Password zaroori hai");
+return;
+}
+localStorage.setItem("userEmail", email.value);
+localStorage.setItem("userPass", password.value);
+alert("Profile create ho gaya");
+}
+
+function login() {
+if (email.value === localStorage.getItem("userEmail")) {
+showScreen("adsScreen");
+} else {
+alert("User nahi mila");
+}
+}
+
+function forgotPassword() {
+let otp = prompt("OTP dalo (demo: 123456)");
+alert(otp === "123456" ? "OTP verified" : "Galat OTP");
+}
+
+function vote(choice) {
+if (localStorage.getItem("voted")) {
+alert("Aap vote kar chuke hain");
+return;
+}
+
+let votes = JSON.parse(localStorage.getItem("votes")) ||
+{yes:0,no:0,investigation:0};
+
+votes[choice]++;
+localStorage.setItem("votes", JSON.stringify(votes));
+localStorage.setItem("voted", "true");
+
+rYes.innerText = "Haan : " + votes.yes;
+rNo.innerText = "Nahi : " + votes.no;
+rInv.innerText = "Jaanch : " + votes.investigation;
+
+showScreen("resultScreen");
+}
+</script>
+
+</body>
+</html>
